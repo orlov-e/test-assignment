@@ -1,0 +1,12 @@
+# Ignore artifacts:
+dist
+node_modules
+coverage
+*.log
+
+# Ignore config files
+.env
+.env.*
+
+# Ignore build files
+*.tsbuildinfo
