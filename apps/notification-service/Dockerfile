@@ -1,0 +1,29 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
+
+RUN npm ci
+
+COPY shared ./shared
+COPY apps/notification-service ./apps/notification-service
+
+RUN npm run build:notification
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci --only=production
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/shared ./shared
+
+EXPOSE 3002
+
+CMD ["node", "dist/apps/notification-service/src/main.js"]

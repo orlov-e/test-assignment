@@ -1,0 +1,96 @@
+services:
+  postgres:
+    container_name: obrio-postgres
+    image: postgres:17-alpine
+    restart: always
+    command: postgres -c 'max_connections=400'
+    ports:
+      - '5432:5432'
+    env_file:
+      - './.env'
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', '${POSTGRES_USER}']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    environment:
+      POSTGRES_DB: '${POSTGRES_DB}'
+      POSTGRES_USER: '${POSTGRES_USER}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+    volumes:
+      - obrio-pgdata:/var/lib/postgresql/data
+    networks:
+      - obrio-network
+
+  rabbitmq:
+    container_name: obrio-rabbitmq
+    image: rabbitmq:3.13-management-alpine
+    restart: always
+    ports:
+      - '5672:5672' # AMQP protocol
+      - '15672:15672' # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: '${RABBITMQ_USER}'
+      RABBITMQ_DEFAULT_PASS: '${RABBITMQ_PASSWORD}'
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - obrio-rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - obrio-network
+
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: .
+      dockerfile: ./apps/api-gateway/Dockerfile
+    ports:
+      - '3000:3000'
+    env_file:
+      - './.env'
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - obrio-network
+
+  user-service:
+    container_name: user-service
+    build:
+      context: .
+      dockerfile: ./apps/user-service/Dockerfile
+    env_file:
+      - './.env'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - obrio-network
+
+  notification-service:
+    container_name: notification-service
+    build:
+      context: .
+      dockerfile: ./apps/notification-service/Dockerfile
+    env_file:
+      - './.env'
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - obrio-network
+
+volumes:
+  obrio-pgdata:
+    name: obrio-pgdata
+  obrio-rabbitmq-data:
+    name: obrio-rabbitmq-data
+
+networks:
+  obrio-network:
+    name: obrio-network
