@@ -26,7 +26,6 @@ flowchart LR
     subgraph infrastructure [Infrastructure]
         postgres[(PostgreSQL)]
         rabbitmq[(RabbitMQ)]
-        redis[(Redis)]
     end
     subgraph external [External Services]
         webhook[(Webhook API)]
@@ -37,7 +36,6 @@ flowchart LR
     rabbitmq -->|Deferred Queue| notif_svc
     user_svc <-->|SQL| postgres
     notif_svc -->|HTTP| webhook
-    postgres -.->|Cache| redis
 ```
 
 - **api-gateway** - REST API entry point built with Fastify. Handles HTTP requests and forwards them to appropriate microservices via RabbitMQ RPC.
