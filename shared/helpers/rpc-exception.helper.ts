@@ -16,7 +16,7 @@ export function CustomRpcException(data: RpcExceptionData): RpcException {
 
 @Catch(RpcException)
 export class RpcExceptionFilter implements ExceptionFilter {
-	catch(exception: RpcException, host: ArgumentsHost): Observable<any> {
+	catch(exception: RpcException, _host: ArgumentsHost): Observable<unknown> {
 		return throwError(() => exception.getError());
 	}
 }

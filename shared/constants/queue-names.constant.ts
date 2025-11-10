@@ -1,15 +1,9 @@
 export const QUEUES = {
 	USER_QUEUE: 'user_queue',
 	NOTIFICATION_QUEUE: 'notification_queue',
-	DELAYED_NOTIFICATION_QUEUE: 'delayed_notification_queue',
+	DEFERRED_QUEUE: 'deferred_queue',
 } as const;
 
-export const QUEUE_NAMES = {
-	USERS: 'users',
-	NOTIFICATIONS: 'notifications',
-	DELAYED_NOTIFICATIONS: 'delayed_notifications',
-} as const;
+export const DEAD_LETTER_EXCHANGE = 'dead_letter_exchange' as const;
 
-export const DLX_EXCHANGE = 'dlx' as const;
-
-export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
+export type QueueName = (typeof QUEUES)[keyof typeof QUEUES];

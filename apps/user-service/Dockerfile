@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ COPY apps/user-service ./apps/user-service
 
 RUN npm run build:user
 
-FROM node:20-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
@@ -33,4 +33,4 @@ COPY --from=builder /app/shared ./shared
 
 EXPOSE 3001
 
-CMD ["node", "dist/apps/user-service/src/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/apps/user-service/apps/user-service/src/main.js"]

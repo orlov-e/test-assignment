@@ -8,5 +8,9 @@ export const USER_EVENTS = {
 	USER_CREATED: 'user.created',
 } as const;
 
+export const NOTIFICATION_EVENTS = {
+	SEND_NOTIFICATION: 'send_notification',
+} as const;
+
 export type UserPattern = (typeof USER_PATTERNS)[keyof typeof USER_PATTERNS];
 export type UserEvent = (typeof USER_EVENTS)[keyof typeof USER_EVENTS];

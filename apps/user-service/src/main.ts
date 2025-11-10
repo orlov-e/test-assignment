@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { RpcExceptionFilter } from '@shared/helpers';
 
@@ -15,8 +16,10 @@ async function bootstrap() {
 			noAck: false,
 			prefetchCount: 1,
 		},
+		bufferLogs: true,
 	});
 
+	app.useLogger(app.get(Logger));
 	app.useGlobalFilters(new RpcExceptionFilter());
 
 	await app.listen();

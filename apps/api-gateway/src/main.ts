@@ -3,13 +3,16 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
 	const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
 		abortOnError: false,
+		bufferLogs: true,
 	});
 
+	app.useLogger(app.get(Logger));
 	app.enableCors();
 
 	app.useGlobalPipes(
@@ -20,7 +23,7 @@ async function bootstrap() {
 			transformOptions: {
 				enableImplicitConversion: true,
 			},
-		})
+		}),
 	);
 
 	app.setGlobalPrefix('api');

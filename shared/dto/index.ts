@@ -1,4 +1,3 @@
-export * from './create-user.dto';
-export * from './user-response.dto';
-export * from './pagination-query.dto';
-export * from './pagination-response.dto';
+export * from './user/create-user.dto';
+export * from './user/user-response.dto';
+export * from './notification/notification-event.dto';

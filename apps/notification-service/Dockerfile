@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ COPY apps/notification-service ./apps/notification-service
 
 RUN npm run build:notification
 
-FROM node:20-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
@@ -26,4 +26,4 @@ COPY --from=builder /app/shared ./shared
 
 EXPOSE 3002
 
-CMD ["node", "dist/apps/notification-service/src/main.js"]
+CMD ["node", "dist/apps/notification-service/apps/notification-service/src/main.js"]

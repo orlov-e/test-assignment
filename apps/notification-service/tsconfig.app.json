@@ -3,6 +3,6 @@
 	"compilerOptions": {
 		"outDir": "../../dist/apps/notification-service"
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "../../shared/**/*"],
 	"exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }

@@ -1,58 +1,39 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import * as amqp from 'amqp-connection-manager';
-import { ChannelWrapper } from 'amqp-connection-manager';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+interface NotificationMessage {
+	userId: string;
+	username: string;
+	type: string;
+	message: string;
+}
 
 @Injectable()
-export class NotificationsService implements OnModuleInit {
-	private connection: amqp.AmqpConnectionManager;
-	private channelWrapper: ChannelWrapper;
-	private readonly DELAY_MS = 24 * 60 * 60 * 1000;
+export class NotificationsService {
+	private readonly logger = new Logger(NotificationsService.name);
 
-	async onModuleInit() {
-		await this.setupDelayedQueue();
-	}
+	constructor(private readonly configService: ConfigService) {}
 
-	private async setupDelayedQueue() {
-		const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://admin:admin123@localhost:5672';
+	async sendNotification(notification: NotificationMessage): Promise<void> {
+		const externalApiUrl = this.configService.get<string>('EXTERNAL_API_URL')!;
 
-		this.connection = amqp.connect([rabbitmqUrl]);
+		try {
+			this.logger.log(`Sending notification to external API: ${externalApiUrl}`);
 
-		this.channelWrapper = this.connection.createChannel({
-			setup: async (channel: any) => {
-				await channel.assertQueue('notification_queue', { durable: true });
+			const response = await fetch(externalApiUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(notification),
+			});
 
-				await channel.assertQueue('delayed_notification_queue', {
-					durable: true,
-					deadLetterExchange: '',
-					deadLetterRoutingKey: 'notification_queue',
-					messageTtl: this.DELAY_MS,
-				});
+			if (!response.ok) {
+				throw new Error(`External API returned status ${response.status}`);
+			}
 
-				console.log('Delayed notification queue configured with 24h TTL');
-			},
-		});
-
-		await this.channelWrapper.waitForConnect();
-	}
-
-	async scheduleWelcomeNotification(userData: any) {
-		const message = {
-			userId: userData.id,
-			username: userData.username,
-			type: 'welcome',
-			scheduledAt: new Date(),
-			deliverAt: new Date(Date.now() + this.DELAY_MS),
-		};
-
-		await this.channelWrapper.sendToQueue('delayed_notification_queue', Buffer.from(JSON.stringify(message)), {
-			persistent: true,
-		});
-
-		console.log(`Scheduled welcome notification for user ${userData.username} to be sent in 24 hours`);
-	}
-
-	async onModuleDestroy() {
-		await this.channelWrapper.close();
-		await this.connection.close();
+			this.logger.log(`Successfully sent ${notification.type} notification for user ${notification.username}`);
+		} catch (error) {
+			this.logger.error(`Failed to send notification to external API:`, error);
+			throw error;
+		}
 	}
 }
