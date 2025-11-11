@@ -1,6 +1,6 @@
 # Obrio Backend
 
-**Scalable microservices platform built with NestJS, TypeScript, PostgreSQL/Prisma, RabbitMQ, Redis, and Docker**
+**Scalable microservices platform built with NestJS, TypeScript, PostgreSQL/Prisma, RabbitMQ, and Docker**
 
 ---
 
@@ -55,9 +55,9 @@ flowchart LR
 
 ### Prerequisites
 
-- **Docker** 20.10+ (+ docker-compose)
+- **Docker** 28.5+ (+ docker-compose)
 - **Node.js** 24+ (LTS recommended)
-- **npm** 9+
+- **npm** 11.6+
 
 ### Local Setup
 
@@ -76,7 +76,6 @@ flowchart LR
     Key variables:
     - `DATABASE_URL` - PostgreSQL connection string
     - `RABBITMQ_URL` - RabbitMQ connection string
-    - `REDIS_HOST`, `REDIS_PORT` - Redis connection
     - `NOTIFICATION_WEBHOOK_URL` - External webhook endpoint
     - `NOTIFICATION_DELAY_MS` - Notification delay in milliseconds (default: 5000)
 
@@ -114,11 +113,9 @@ This pattern allows for scheduled notifications without polling or external sche
 - **Fastify** - High-performance web framework
 - **Prisma** 6.19.0 - Next-generation ORM
 - **RabbitMQ** - Message broker with DLX support
-- **Redis** - In-memory data store
 - **PostgreSQL** - Relational database
 - **Pino** - Fast JSON logger
 - **Docker** - Containerization
-- **ESLint** + **Prettier** - Code quality tools
 
 ---
 
