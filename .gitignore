@@ -35,8 +35,8 @@ Thumbs.db
 coverage/
 .nyc_output/
 
-# Prisma
-prisma/migrations/**/migration.sql
+# # Prisma
+# prisma/migrations/**/migration.sql
 
 # Docker
 .dockerignore
